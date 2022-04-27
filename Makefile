@@ -1,10 +1,13 @@
-CC = gcc
+CC = g++
 MPI = mpicc
 
 all:: main
 
-main: main.c
-	${CC} -o chess main.c -I.
+main: main.cpp
+	${CC} -o chess main.cpp -I.
+
+compile:
+	make; clear; chess
 
 run:
 	chess
