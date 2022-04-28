@@ -21,7 +21,19 @@ void precomputeBoardOffsets() {
 
     }
   }
+}
 
+
+// Parallelize!
+void prune_moves() {
+  std::vector<struct move> m2;
+  std::vector<struct move> moves_cpy = moves;
+  for (struct move m : moves_cpy) {
+    if (validate(m.start, m.target)) {
+      m2.push_back(m);
+    }
+  }
+  moves = m2;
 }
 
 
@@ -39,6 +51,7 @@ void play() {
 
 	while (exit_status == 0) {
     generate_moves();
+    prune_moves();
     print_moves();
 		print_board();
 		printf("chess > ");

@@ -46,6 +46,22 @@ char get_color(char piece) {
 }
 
 
+// Make move.
+char make_move(int start, int target) {
+  char p = b->board[target];
+  b->board[target] = b->board[start];
+  b->board[start] = 0;
+  return p;
+}
+
+
+// Unmake move.
+void unmake_move(int start, int target, char p) {
+  make_move(target, start);
+  b->board[target] = p;
+}
+
+
 // Generates & add move to moves.
 void add_move(int start, int target) {
   struct move m;
@@ -70,7 +86,7 @@ void generate_sliding_moves(int start, char piece) {
 
       add_move(start, target);
 
-      if (is_color(target_piece, get_color(piece))) {
+      if (target_piece != 0 && !is_color(target_piece, get_color(piece))) {
         break;
       }
     }
@@ -132,7 +148,6 @@ void generate_pawn_moves(int start, char piece) {
 
     if (numSquaresToEdge[start][7] > 0) {
       char frontright = b->board[start + directionOffsets[7]];
-      printf("Front Right: '%c' '%d'\n", frontright, directionOffsets[7]);
       if (frontright && cur_color != get_color(frontright)) {
         add_move(start, start + directionOffsets[7]);
       }
@@ -230,3 +245,137 @@ void generate_moves() {
   } // end for().
 
 }
+
+
+// Check if proposed move is legal
+bool validate(int start, int target) {
+  bool DEBUG = false;
+  char piece = b->board[start];
+  char target_piece = b->board[target];
+  char cur_color = get_color(piece);
+  bool in_moves = false;
+
+  // Check it is my piece.
+  if (cur_color != b->turn) {
+    return false;
+  }
+
+  // Check if move is in moves.
+  for (struct move m : moves) {
+    if (m.start == start && m.target == target) {
+      in_moves = true;
+      break;
+    }
+  }
+
+  if (!in_moves) return false;
+
+  // Check for check(mate)
+  
+  // find my king
+  int king_pos = 0;
+  for (int i = 0 ; i < 64 ; i++) {
+    if ((cur_color == 'Z' && b->board[i] == 'K') || 
+        (cur_color == 'z' && b->board[i] == 'k')) {
+      king_pos = i;
+      break;
+    }
+  }
+
+
+  // check if my king is in check
+  std::vector<struct move> my_moves = moves;
+  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  generate_moves();
+  std::vector<struct move> opp_moves = moves;
+  moves = my_moves;
+  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  bool check = false;
+
+  for (struct move m : opp_moves) {
+    if (m.target == king_pos) {
+      check = true;
+    }
+  }
+
+  
+  // If i am in check, see if move removes check.
+  if (check) {
+    char p = make_move(start, target);
+    if (king_pos == start) {
+      king_pos = target;
+    }
+
+    // Make opponent's moves after my move.
+    std::vector<struct move> my_moves = moves;
+    b->turn = b->turn == 'z' ? 'Z' : 'z';
+    generate_moves();
+    std::vector<struct move> opp_moves = moves;
+    moves = my_moves;
+    b->turn = b->turn == 'z' ? 'Z' : 'z';
+    bool still_check = false;
+
+    // Check if still in check.
+    if (b->board[target] == 'k') {
+      printf("Here\n");
+    }
+    for (struct move m : opp_moves) {
+      if (b->board[target] == 'k') {
+        printf("%c: %d->%d\n", b->board[m.start], m.start, m.target);
+      }
+      if (m.target == king_pos) {
+        still_check = true;
+
+      }
+    }
+    
+    if (b->board[target] == 'k') {
+      printf("END Here\n");
+    }
+
+    unmake_move(start, target, p);
+    if (king_pos == target) {
+      king_pos = start;
+    }
+
+    
+    if (still_check) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+
+  // Check if move my piece puts king into check.
+  char p = make_move(start, target);
+
+  // Make opponent's moves after my move.
+  my_moves = moves;
+  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  generate_moves();
+  opp_moves = moves;
+  moves = my_moves;
+  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  bool still_check = false;
+
+  // Check if in check.
+  for (struct move m : opp_moves) {
+    if (m.target == king_pos) {
+      still_check = true;
+      //check_moves.push_back(m);
+    }
+  }
+
+  unmake_move(start, target, p);
+
+  if (still_check) {
+    return false;
+  }
+
+  return true;
+}
+
+
+
+

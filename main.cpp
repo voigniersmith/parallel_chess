@@ -1,6 +1,7 @@
 #include "includes.h"
-#include "board.cpp"
 #include "board_rep.cpp"
+#include "board.cpp"
+#include "parse_inp.cpp"
 #include "init.cpp"
 
 // Global Variables.

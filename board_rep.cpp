@@ -86,51 +86,6 @@ void board_to_fen() {
 	strcpy(b->layout, temp);
 }
 
-// Function to parse the input
-int parse_inp(char* s) {
-
-  // Other commands check here.
-	if (strcmp(s, "q") == 0) return 1;
-	if (strcmp(s, "exit") == 0) return 1;
-	
-  // Check for FEN.
-	if (strchr(s, '/') != NULL) {
-		strcpy(b->layout, s);
-    fen_to_board();
-		return 0;
-	}
-
-	// Assume input to be coordinate notation.
-	if (s[0] < 'a' || s[0] > 'h' ||
-		s[1] < '0' || s[1] > '9' ||
-		s[2] < 'a' || s[2] > 'h' ||
-		s[3] < '0' || s[3] > '9') {
-		printf("Illegal Move\n");
-		return 0;
-	}
-
-	int col_from = s[0] - 'a';
-	int row_from = s[1] - '0' - 1;
-	row_from = 7 - row_from;
-	int col_to = s[2] - 'a';
-	int row_to = s[3] - '0' - 1;
-	row_to = 7 - row_to;
-
-  char cur_color = get_color(b->board[row_from * 8 + col_from]);
-
-  if (cur_color != b->turn) {
-    printf("Illegal Move\n");
-    return 0;
-  }
-
-	// Update Board Representation
-	b->board[row_to * 8 + col_to] = b->board[row_from * 8 + col_from];
-	b->board[row_from * 8 + col_from] = 0;
-
-	// Update Layout (FEN Notation)
-	board_to_fen();
-	return 0;
-}
 
 // Function to print the board based on the layout
 void print_board () {
