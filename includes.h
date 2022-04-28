@@ -6,6 +6,9 @@
 #include <stdbool.h>
 #include <iostream>
 #include <vector>
+#include <time.h>
+#include <unistd.h>
+#include <climits>
 
 // Preprocessor directives here.
 #ifndef max
@@ -34,3 +37,9 @@ extern struct board* b; // My board.
 extern int directionOffsets[];  // Numbers to add to move in dir.
 extern int numSquaresToEdge[64][8];  // Bounds of board from any piece.
 extern std::vector<struct move> moves;  // All possible moves.
+extern char board_start[];
+extern int moves_ctr;
+extern struct move best_move;
+
+// Function declarations.
+void prune_moves();

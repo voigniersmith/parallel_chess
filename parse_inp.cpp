@@ -1,5 +1,21 @@
 // Bot makes next best move.
 void bot_make_move() {
+  search(4, 4);
+  struct move m = best_move;
+  
+  // Update counter and make move.
+  moves_ctr++;
+
+  if (tolower(b->board[m.start]) == 'p') {
+    moves_ctr = 0;
+  }
+  char piece = make_move(m.start, m.target);
+  if (piece != 0) {
+    moves_ctr = 0;
+  }
+
+  // Update Layout (FEN Notation)
+  board_to_fen();
 
 }
 
@@ -13,7 +29,11 @@ int parse_inp(char* s) {
     strcpy(b->layout, s);
     fen_to_board();
     return 0;
-  } else if (strcmp(s, "on") == 0) {  // Bot make next move.
+  } else if (strcmp(s, "c") == 0 || strcmp(s, "clear") == 0) {
+    strcpy(b->layout, board_start);
+    fen_to_board();
+    return 0;
+  } else if (strcmp(s, "bot") == 0) {  // Bot make next move.
     bot_make_move();
   } else {  // Human make next move.
 
@@ -41,9 +61,16 @@ int parse_inp(char* s) {
       return 0;
     }
 
-    // Update Board Representation
-    b->board[row_to * 8 + col_to] = b->board[row_from * 8 + col_from];
-    b->board[row_from * 8 + col_from] = 0;
+    // Update counter and make move.
+    moves_ctr++;
+
+    if (tolower(b->board[row_from * 8 + col_from]) == 'p') {
+      moves_ctr = 0;
+    }
+    char piece = make_move(row_from * 8 + col_from, row_to * 8 + col_to);
+    if (piece != 0) {
+      moves_ctr = 0;
+    }
 
     // Update Layout (FEN Notation)
     board_to_fen();

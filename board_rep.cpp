@@ -89,7 +89,7 @@ void board_to_fen() {
 
 // Function to print the board based on the layout
 void print_board () {
-	int rows = 7, columns = 0, spaces = 0;
+	int rows = 8, columns = 0, spaces = 0;
 	int size = strlen(b->layout) - 2;
 
   if (b->turn == 'z')
@@ -98,7 +98,7 @@ void print_board () {
 	  printf("\t  +------------------------+\n");
 
 	for (int i = 0; i < size; i++) {
-		printf("\t%d |", rows-- + 1);
+		printf("\t%d |", rows--);
 		while(b->layout[i] != '/' && i != size) {
 			if (isdigit(b->layout[i])) {
 				spaces = atoi(&b->layout[i]);
@@ -107,7 +107,7 @@ void print_board () {
 						printf(":::");
 					} else if (columns % 2 == 1 && rows % 2 == 0) {
 						printf(":::");
-					}else {
+					} else {
 						printf("   ");
 					}
 					spaces--;

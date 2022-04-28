@@ -247,6 +247,43 @@ void generate_moves() {
 }
 
 
+// Is my king in check?
+bool in_check() {
+
+  char cur_color = b->turn;
+  
+  // Find my king.
+  int king_pos = 0;
+  for (int i = 0 ; i < 64 ; i++) {
+    if ((cur_color == 'Z' && b->board[i] == 'K') || 
+        (cur_color == 'z' && b->board[i] == 'k')) {
+      king_pos = i;
+      break;
+    }
+  }
+
+
+  // Check if my king is in check.
+  std::vector<struct move> my_moves = moves;
+  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  generate_moves();
+  std::vector<struct move> opp_moves = moves;
+  moves = my_moves;
+  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  bool check = false;
+
+  for (struct move m : opp_moves) {
+    if (m.target == king_pos) {
+      check = true;
+    }
+  }
+
+  return check;
+}
+
+
+
+
 // Check if proposed move is legal
 bool validate(int start, int target) {
   bool DEBUG = false;
@@ -271,8 +308,8 @@ bool validate(int start, int target) {
   if (!in_moves) return false;
 
   // Check for check(mate)
+  bool check = in_check();
   
-  // find my king
   int king_pos = 0;
   for (int i = 0 ; i < 64 ; i++) {
     if ((cur_color == 'Z' && b->board[i] == 'K') || 
@@ -281,23 +318,6 @@ bool validate(int start, int target) {
       break;
     }
   }
-
-
-  // check if my king is in check
-  std::vector<struct move> my_moves = moves;
-  b->turn = b->turn == 'z' ? 'Z' : 'z';
-  generate_moves();
-  std::vector<struct move> opp_moves = moves;
-  moves = my_moves;
-  b->turn = b->turn == 'z' ? 'Z' : 'z';
-  bool check = false;
-
-  for (struct move m : opp_moves) {
-    if (m.target == king_pos) {
-      check = true;
-    }
-  }
-
   
   // If i am in check, see if move removes check.
   if (check) {
@@ -316,21 +336,10 @@ bool validate(int start, int target) {
     bool still_check = false;
 
     // Check if still in check.
-    if (b->board[target] == 'k') {
-      printf("Here\n");
-    }
     for (struct move m : opp_moves) {
-      if (b->board[target] == 'k') {
-        printf("%c: %d->%d\n", b->board[m.start], m.start, m.target);
-      }
       if (m.target == king_pos) {
         still_check = true;
-
       }
-    }
-    
-    if (b->board[target] == 'k') {
-      printf("END Here\n");
     }
 
     unmake_move(start, target, p);
@@ -338,7 +347,6 @@ bool validate(int start, int target) {
       king_pos = start;
     }
 
-    
     if (still_check) {
       return false;
     } else {
@@ -349,12 +357,15 @@ bool validate(int start, int target) {
 
   // Check if move my piece puts king into check.
   char p = make_move(start, target);
+  if (king_pos == start) {
+    king_pos = target;
+  }
 
   // Make opponent's moves after my move.
-  my_moves = moves;
+  std::vector<struct move> my_moves = moves;
   b->turn = b->turn == 'z' ? 'Z' : 'z';
   generate_moves();
-  opp_moves = moves;
+  std::vector<struct move> opp_moves = moves;
   moves = my_moves;
   b->turn = b->turn == 'z' ? 'Z' : 'z';
   bool still_check = false;
@@ -368,6 +379,9 @@ bool validate(int start, int target) {
   }
 
   unmake_move(start, target, p);
+  if (king_pos == target) {
+    king_pos = start;
+  }
 
   if (still_check) {
     return false;
