@@ -13,4 +13,4 @@ run:
 	chess
 
 clean:
-	rm chess
+	rm chess; rm *.csv

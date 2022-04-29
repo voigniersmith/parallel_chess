@@ -97,6 +97,7 @@ void play() {
 	int exit_status = 0;
 	b = (struct board*) malloc(sizeof(struct board));
 	char inp[100];
+  char str[] = "autobot";
 	b->layout = (char*) malloc(sizeof(char) * 100);
 	strcpy(b->layout, board_start);
 	b->board = (int*) calloc(64, sizeof(int));
@@ -104,23 +105,45 @@ void play() {
 
   precomputeBoardOffsets();
 
-	while (exit_status == 0) {
+  struct timeval start, end;
+
+  FILE *file = fopen("minmax_stats.csv", "w+");
+  fprintf(file, "moves, time, depth\n");
+	
+  while (exit_status < 1) {
+    gettimeofday(&start, NULL);
     generate_moves();
+
+    // Output moves sise to file.
+    fprintf(file, "%ld, ", moves.size());
+
     prune_moves();
     //print_moves();
     if (check_if_end()) {
-      break;
       printf("\nReseting Board.\n\n");
       strcpy(b->layout, board_start);
       fen_to_board();
       moves_ctr = 0;
+      exit_status = 0;
     }
 		print_board();
-		//printf("chess > ");
-		//fgets(inp, 100, stdin);
-    inp[strlen(inp) - 1] = 0;
-		exit_status = parse_inp("bot");
-    usleep(250000);
+    if (exit_status != -1) {
+		  printf("chess > ");
+		  fgets(inp, 100, stdin);
+      inp[strlen(inp) - 1] = 0;
+		  exit_status = parse_inp(inp);
+    } else {
+      exit_status = parse_inp(str);
+    }
+    gettimeofday(&end, NULL);
+
+    float dif_ms = ((end.tv_sec - start.tv_sec) * 1000000 
+      + end.tv_usec - start.tv_usec) / 1000;
+
+    fprintf(file, "%f, %d\n", dif_ms, global_depth);
+    printf("Time to think = %f ms\n", dif_ms);
 	}
+
+  fclose(file);
 
 }

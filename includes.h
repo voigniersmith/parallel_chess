@@ -1,5 +1,6 @@
 // Includes here.
 #include <stdio.h>
+#include <sys/time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -7,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <time.h>
+#include <algorithm>
 #include <unistd.h>
 #include <climits>
 
@@ -40,6 +42,7 @@ extern std::vector<struct move> moves;  // All possible moves.
 extern char board_start[];
 extern int moves_ctr;
 extern struct move best_move;
+extern int global_depth;
 
 // Function declarations.
 void prune_moves();

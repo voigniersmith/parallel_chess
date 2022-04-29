@@ -13,6 +13,7 @@ std::vector<struct move> moves;
 char board_start[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w";
 int moves_ctr = 0;
 struct move best_move;
+int global_depth = 5;
 
 // Driver code
 int main (int argc, char** argv) {

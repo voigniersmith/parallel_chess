@@ -100,7 +100,8 @@ void generate_pawn_moves(int start, char piece) {
 
   if (cur_color == 'Z') {
     // Check if pawn can move forward
-    if (!b->board[start + directionOffsets[0]]) {
+    if (!b->board[start + directionOffsets[0]] &&
+        numSquaresToEdge[start][0] > 0) {
       add_move(start, start + directionOffsets[0]);
 
       // Check if pawn hasn't moved.
@@ -127,7 +128,8 @@ void generate_pawn_moves(int start, char piece) {
     }
   } else if (cur_color == 'z') {
     // Check if pawn can move forward
-    if (!b->board[start + directionOffsets[1]]) {
+    if (!b->board[start + directionOffsets[1]] &&
+        numSquaresToEdge[start][1] > 0) {
       add_move(start, start + directionOffsets[1]);
 
       // Check if pawn hasn't moved.
@@ -286,7 +288,6 @@ bool in_check() {
 
 // Check if proposed move is legal
 bool validate(int start, int target) {
-  bool DEBUG = false;
   char piece = b->board[start];
   char target_piece = b->board[target];
   char cur_color = get_color(piece);
@@ -304,7 +305,7 @@ bool validate(int start, int target) {
       break;
     }
   }
-
+  
   if (!in_moves) return false;
 
   // Check for check(mate)

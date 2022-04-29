@@ -1,6 +1,6 @@
 // Bot makes next best move.
 void bot_make_move() {
-  search(4, 4);
+  ab_cap_search(global_depth, global_depth, INT_MIN, INT_MAX);
   struct move m = best_move;
   
   // Update counter and make move.
@@ -23,6 +23,7 @@ void bot_make_move() {
 // Function to parse the input
 int parse_inp(char* s) {
 
+
   if (strcmp(s, "q") == 0 || strcmp(s, "exit") == 0) {  // Quit.
     return 1;
   } else if (strchr(s, '/') != NULL) {  // Check for FEN.
@@ -33,6 +34,12 @@ int parse_inp(char* s) {
     strcpy(b->layout, board_start);
     fen_to_board();
     return 0;
+  } else if (strncmp(s, "d ", 2) == 0) {
+    global_depth = atoi(&s[2]);
+    printf("Depth set to: %d\n", global_depth);
+  } else if (strcmp(s, "autobot") == 0) {
+    bot_make_move();
+    return -1;
   } else if (strcmp(s, "bot") == 0) {  // Bot make next move.
     bot_make_move();
   } else {  // Human make next move.
