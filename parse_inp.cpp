@@ -1,5 +1,6 @@
 // Bot makes next best move.
 void bot_make_move() {
+  best_move.start = -1;
   ab_cap_search(global_depth, global_depth, INT_MIN, INT_MAX);
   struct move m = best_move;
   

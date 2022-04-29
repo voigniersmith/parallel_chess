@@ -43,6 +43,8 @@ extern char board_start[];
 extern int moves_ctr;
 extern struct move best_move;
 extern int global_depth;
+extern int myrank;
+extern int npes;
 
 // Function declarations.
 void prune_moves();

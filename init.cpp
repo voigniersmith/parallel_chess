@@ -119,6 +119,7 @@ void play() {
 
     prune_moves();
     //print_moves();
+
     if (check_if_end()) {
       printf("\nReseting Board.\n\n");
       strcpy(b->layout, board_start);
@@ -126,7 +127,9 @@ void play() {
       moves_ctr = 0;
       exit_status = 0;
     }
+
 		print_board();
+
     if (exit_status != -1) {
 		  printf("chess > ");
 		  fgets(inp, 100, stdin);
@@ -135,13 +138,16 @@ void play() {
     } else {
       exit_status = parse_inp(str);
     }
+
     gettimeofday(&end, NULL);
 
     float dif_ms = ((end.tv_sec - start.tv_sec) * 1000000 
       + end.tv_usec - start.tv_usec) / 1000;
-
-    fprintf(file, "%f, %d\n", dif_ms, global_depth);
-    printf("Time to think = %f ms\n", dif_ms);
+    
+    if (strcmp(inp, "bot") == 0 || strcmp(inp, "autobot") == 0) {
+      fprintf(file, "%f, %d\n", dif_ms, global_depth);
+      printf("Time to think = %f ms\n", dif_ms);
+    }
 	}
 
   fclose(file);

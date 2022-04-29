@@ -1,4 +1,3 @@
-#include <mpi.h>
 #include "includes.h"
 #include "board_rep.cpp"
 #include "board.cpp"
@@ -22,19 +21,19 @@ int myrank, npes;
 int main (int argc, char** argv) {
 
   srand(time(NULL));
-  MPI_Init(&argc, &argv);
-  MPI_Comm_size(MPI_COMM_WORLD, &npes);
-  MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+//  MPI_Init(&argc, &argv);
+//  MPI_Comm_size(MPI_COMM_WORLD, &npes);
+//  MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
-  if (myrank == 0) {
+//  if (myrank == 0) {
 	  printf("Welcome to chess!\n");
 
     play();
 
 	  printf("Thanks for playing!\n");
-  } else {
-    consumer();
-  }
-  MPI_Finalize();
+//  } else {
+//    consumer();
+//  }
+//  MPI_Finalize();
 }
 

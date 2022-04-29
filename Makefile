@@ -1,16 +1,22 @@
 CC = g++
-MPI = mpicc
+MPI = mpic++
 
-all:: main
+all:: main norm
 
 main: main.cpp
-	${CC} -o chess main.cpp -I.
+	${MPI} -o chess main.cpp -I.
+
+norm: main.cpp
+	${CC} -o ser_chess main.cpp -I.
 
 compile:
 	make; clear; chess
 
+serrun:
+	ser_chess
+
 run:
-	chess
+	mpirun -np 4 chess
 
 clean:
 	rm chess; rm *.csv
