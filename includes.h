@@ -1,4 +1,5 @@
 // Includes here.
+#include <mpi.h>
 #include <stdio.h>
 #include <sys/time.h>
 #include <stdlib.h>

@@ -1,11 +1,10 @@
-#include <mpi.h>
 #include "includes.h"
 #include "board_rep.cpp"
 #include "board.cpp"
 #include "search.cpp"
+#include "parallel.cpp"
 #include "parse_inp.cpp"
 #include "init.cpp"
-#include "parallel.cpp"
 
 // Global Variables.
 struct board* b;
@@ -33,6 +32,7 @@ int main (int argc, char** argv) {
 
 	  printf("Thanks for playing!\n");
   } else {
+    init();
     consumer();
   }
   MPI_Finalize();

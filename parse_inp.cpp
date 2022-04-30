@@ -1,9 +1,4 @@
-// Bot makes next best move.
-void bot_make_move() {
-  best_move.start = -1;
-  ab_cap_search(global_depth, global_depth, INT_MIN, INT_MAX);
-  struct move m = best_move;
-  
+void upd_and_move(struct move m) {
   // Update counter and make move.
   moves_ctr++;
 
@@ -17,6 +12,13 @@ void bot_make_move() {
 
   // Update Layout (FEN Notation)
   board_to_fen();
+}
+
+// Bot makes next best move.
+void bot_make_move() {
+  ab_cap_search(global_depth, global_depth, INT_MIN, INT_MAX);
+  struct move m = best_move;
+  upd_and_move(m);  
 
 }
 
@@ -43,6 +45,8 @@ int parse_inp(char* s) {
     return -1;
   } else if (strcmp(s, "bot") == 0) {  // Bot make next move.
     bot_make_move();
+  } else if (strcmp(s, "p") == 0) { // Use parallel bot.
+    upd_and_move(producer());
   } else {  // Human make next move.
 
     if (s[0] < 'a' || s[0] > 'h' ||

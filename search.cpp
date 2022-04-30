@@ -65,10 +65,16 @@ int evaluate() {
 
 // Minimax search.
 int search(int depth, int start_depth) {
-  
+ 
+  printf("Rank = %d\n", myrank);
+  print_board();
+  fflush(stdout);
+
   if (depth == 0) {
     return evaluate();
   }
+
+  printf("1\n");
 
   generate_moves();
   prune_moves();
@@ -81,8 +87,6 @@ int search(int depth, int start_depth) {
   }
 
   int best_eval = INT_MIN;
-
-
 
   std::vector<struct move> cur_moves = moves;
   for (struct move m : cur_moves) {

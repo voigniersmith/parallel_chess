@@ -92,17 +92,29 @@ bool check_if_end() {
 }
 
 
-void play() {
-
-	int exit_status = 0;
-	b = (struct board*) malloc(sizeof(struct board));
-	char inp[100];
-  char str[] = "autobot";
+// Initialize values.
+void init() {
+  best_move.start = -1;
 	b->layout = (char*) malloc(sizeof(char) * 100);
 	strcpy(b->layout, board_start);
 	b->board = (int*) calloc(64, sizeof(int));
-	fen_to_board();
+	
+  struct board b;
+  strcpy(b.layout, board_start);
+  for (int i = 0 ; i < 64 ; i++ ) {
+    b.board[i] = 0;
+  }
 
+  fen_to_board();
+}
+
+
+void play() {
+
+	int exit_status = 0;
+  char inp[100];
+  char str[8] = "autobot";
+  init();
   precomputeBoardOffsets();
 
   struct timeval start, end;
@@ -114,7 +126,7 @@ void play() {
     gettimeofday(&start, NULL);
     generate_moves();
 
-    // Output moves sise to file.
+    // Output moves size to file.
     fprintf(file, "%ld, ", moves.size());
 
     prune_moves();
@@ -132,6 +144,7 @@ void play() {
 
     if (exit_status != -1) {
 		  printf("chess > ");
+      fflush(stdout);
 		  fgets(inp, 100, stdin);
       inp[strlen(inp) - 1] = 0;
 		  exit_status = parse_inp(inp);
