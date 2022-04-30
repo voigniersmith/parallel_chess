@@ -113,21 +113,18 @@ void play() {
   init();
 
   struct timeval start, end;
-
-  FILE *file = fopen("minmax_stats.csv", "w+");
-  fprintf(file, "moves, time, depth\n");
-	
-  print_board();
+  
+  if (!global_stats) {
+    print_board();
+  }
+  
   while (exit_status < 1) {
     generate_moves();
-
-    // Output moves size to file.
-    fprintf(file, "%ld, ", moves.size());
 
     prune_moves();
     //print_moves();
 
-    if (check_if_end()) {
+    if (check_if_end() && !global_stats) {
       printf("\nReseting Board.\n\n");
       strcpy(b.layout, board_start);
       fen_to_board();
@@ -142,7 +139,12 @@ void play() {
 		  print_board();
     }
 
-    if (exit_status != -1) {
+    if (global_stats) {
+      char statty[6] = "stats";
+      exit_status = parse_inp(statty);
+      terminate();
+      break;
+    } else if (exit_status != -1) {
 		  printf("chess > ");
       fflush(stdout);
 		  fgets(inp, 100, stdin);
@@ -160,12 +162,9 @@ void play() {
       + end.tv_usec - start.tv_usec) / 1000;
     
     if (strcmp(inp, "bot") == 0 || strcmp(inp, "autobot") == 0 || strcmp(inp, "p") == 0) {
-      fprintf(file, "%f, %d\n", dif_ms, global_depth);
       printf("Time to think = %f ms\n", dif_ms);
       fflush(stdout);
     }
 	}
-
-  fclose(file);
 
 }

@@ -17,9 +17,13 @@ struct move best_move;
 int global_depth = 5;
 int myrank, npes;
 int parallel = 0;
+bool global_stats = false;
 
 // Driver code.
 int main (int argc, char** argv) {
+  if (argc > 1) {
+    global_stats = true;
+  }
 
   srand(time(NULL));
   MPI_Init(&argc, &argv);
@@ -27,14 +31,18 @@ int main (int argc, char** argv) {
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
   if (myrank == 0) {
-    printf("Final Project for Parallel Computing.\n");
-    printf("Developed by Team AAA.\n\n");
-	  printf("Welcome to chess!\n");
-    printf("Type 'help' for a list of commands.\n");
+    if (!global_stats) {
+      printf("Final Project for Parallel Computing.\n");
+      printf("Developed by Team AAA.\n\n");
+      printf("Welcome to chess!\n");
+      printf("Type 'help' for a list of commands.\n");
+    }
 
     play();
 
-	  printf("Thanks for playing!\n");
+    if (!global_stats) {
+      printf("Thanks for playing!\n");
+    }
   } else {
     init();
     consumer();

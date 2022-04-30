@@ -47,6 +47,7 @@ extern int global_depth;
 extern int myrank;
 extern int npes;
 extern int parallel;
+extern bool global_stats;
 
 // Function declarations.
 void prune_moves();

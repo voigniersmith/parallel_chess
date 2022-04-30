@@ -11,6 +11,7 @@ struct work_msg {
   struct board b;
   struct move m;
   int p;
+  int e;
 };
 
 
@@ -22,14 +23,8 @@ struct res_msg {
 
 // Producer ends consumers.
 void terminate() {
-  MPI_Status status;
-  int b;
-
-  // Send p - 1 terminate messages.
-  for (int i = 1; i < npes; i++) {
-    MPI_Recv(&b, 0, MPI_BYTE, i, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-    MPI_Send(&b, 0, MPI_BYTE, i, 3, MPI_COMM_WORLD);
-  }
+  MPI_Abort(MPI_COMM_WORLD, 0);
+  return;
 }
 
 
@@ -39,6 +34,7 @@ struct move producer() {
   struct work_msg w;
   struct move m;
   MPI_Status status;
+  int best_alpha = INT_MIN;
   
   // Create queue of moves.
   std::vector<struct move> cur_moves = moves; 
@@ -56,6 +52,9 @@ struct move producer() {
     
     if (status.MPI_TAG == 1) { // If ACK insert response into results.
       results.push_back(std::make_pair(r.e, r.m));
+      if (r.e > best_alpha) {
+        best_alpha = r.e;
+      }
     
     } else if (status.MPI_TAG == 2 && cur_moves.size() != 0) { // If polled and work to do.
       m = cur_moves.back();
@@ -67,6 +66,7 @@ struct move producer() {
       w.b = b;
       w.m = m;
       w.p = parallel;
+      w.e = best_alpha;
       unmake_move(m.start, m.target, c);
 
       // Send work
@@ -92,12 +92,13 @@ void consumer() {
   struct res_msg r;
   struct work_msg w;
   struct move m;
+  int buff = 0;
   MPI_Status status;
 
   // While work to do
   while (1) {
     // Send poll
-    MPI_Send(&w, 0, MPI_BYTE, 0, 2, MPI_COMM_WORLD);
+    MPI_Send(&buff, 0, MPI_BYTE, 0, 2, MPI_COMM_WORLD);
 
     // Wait for work
     MPI_Recv(&w, sizeof(w), MPI_BYTE, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
@@ -112,9 +113,9 @@ void consumer() {
     if (parallel == 3) {
       r.e = search(w.d, w.d);
     } else if (parallel == 4) {
-      r.e = ab_search(w.d, w.d, INT_MIN, INT_MAX);
+      r.e = ab_search(w.d, w.d, w.e, INT_MAX);
     } else {
-      r.e = ab_cap_search(w.d, w.d, INT_MIN, INT_MAX);
+      r.e = ab_cap_search(w.d, w.d, w.e, INT_MAX);
     }
     r.m = w.m;
 

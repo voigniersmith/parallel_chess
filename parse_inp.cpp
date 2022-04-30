@@ -82,6 +82,41 @@ int parse_inp(char* s) {
   } else if (strncmp(s, "d ", 2) == 0) {
     global_depth = atoi(&s[2]);
     printf("Depth set to: %d\n", global_depth);
+  } else if (strcmp(s, "stats") == 0) {
+
+    char filename[100];
+    sprintf(filename, "stats_%d.csv", npes);
+    FILE *file = fopen(filename, "w+");
+    fprintf(file, "p, d, t, time\n");
+	
+    for (int d = 1 ; d < 7 ; d++) {
+      for (int t = 0 ; t < 6 ; t++) {
+        
+        printf("Progress for %d procs: %.2f%%\r", npes, (float) ((d - 1) * 6 + t) * 100 / 36);
+        fflush(stdout);
+
+        // Set variables.
+        parallel = t;
+        global_depth = d;
+
+        // Set board to bench FEN.
+        strcpy(b.layout, board_start);
+        fen_to_board();
+
+        struct timeval t1, t2;
+        gettimeofday(&t1, NULL);
+        bot_make_move();
+        gettimeofday(&t2, NULL);
+      
+        float dif_ms = (t2.tv_sec - t1.tv_sec) * 1000 + (t2.tv_usec - t1.tv_usec) / 1000;
+        fprintf(file, "%d, %d, %d, %f\n", npes - 1, d, t, dif_ms);
+        fflush(file);
+
+      }
+    }
+
+    fclose(file);
+
   } else if (strcmp(s, "autobot") == 0) {
     bot_make_move();
     return -1;

@@ -80,8 +80,6 @@ void board_to_fen() {
     b.turn = 'Z';
   }
   temp[++pos] = 0;
-	
-  printf("%s\n", temp);
 
 	strcpy(b.layout, temp);
 }
