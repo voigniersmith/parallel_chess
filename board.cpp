@@ -48,9 +48,9 @@ char get_color(char piece) {
 
 // Make move.
 char make_move(int start, int target) {
-  char p = b->board[target];
-  b->board[target] = b->board[start];
-  b->board[start] = 0;
+  char p = b.board[target];
+  b.board[target] = b.board[start];
+  b.board[start] = 0;
   return p;
 }
 
@@ -58,7 +58,7 @@ char make_move(int start, int target) {
 // Unmake move.
 void unmake_move(int start, int target, char p) {
   make_move(target, start);
-  b->board[target] = p;
+  b.board[target] = p;
 }
 
 
@@ -79,7 +79,7 @@ void generate_sliding_moves(int start, char piece) {
   for (int i = start_dir_idx; i < end_dir_idx; i++) {
     for (int j = 0; j < numSquaresToEdge[start][i]; j++) {
       int target = start + directionOffsets[i] * (j + 1);
-      int target_piece = b->board[target];
+      int target_piece = b.board[target];
       if(is_color(target_piece, get_color(piece))) {
         break;
       }
@@ -100,13 +100,13 @@ void generate_pawn_moves(int start, char piece) {
 
   if (cur_color == 'Z') {
     // Check if pawn can move forward
-    if (!b->board[start + directionOffsets[0]] &&
+    if (!b.board[start + directionOffsets[0]] &&
         numSquaresToEdge[start][0] > 0) {
       add_move(start, start + directionOffsets[0]);
 
       // Check if pawn hasn't moved.
       if (start >= 48 && start <= 55) {
-         if (!b->board[start + (2 * directionOffsets[0])]) {
+         if (!b.board[start + (2 * directionOffsets[0])]) {
            add_move(start, start + (2 * directionOffsets[0]));
          }
       }
@@ -114,27 +114,27 @@ void generate_pawn_moves(int start, char piece) {
 
     // Check frontleft & frontright.
     if (numSquaresToEdge[start][4] > 0) {
-      char frontleft = b->board[start + directionOffsets[4]];
+      char frontleft = b.board[start + directionOffsets[4]];
       if (frontleft && cur_color != get_color(frontleft)) {
         add_move(start, start + directionOffsets[4]);
       }
     }
 
     if (numSquaresToEdge[start][6] > 0) {
-      char frontright = b->board[start + directionOffsets[6]];
+      char frontright = b.board[start + directionOffsets[6]];
       if (frontright && cur_color != get_color(frontright)) {
         add_move(start, start + directionOffsets[6]);
       }
     }
   } else if (cur_color == 'z') {
     // Check if pawn can move forward
-    if (!b->board[start + directionOffsets[1]] &&
+    if (!b.board[start + directionOffsets[1]] &&
         numSquaresToEdge[start][1] > 0) {
       add_move(start, start + directionOffsets[1]);
 
       // Check if pawn hasn't moved.
       if (start >= 8 && start <= 15) {
-        if (!b->board[start + (2 * directionOffsets[1])]) {
+        if (!b.board[start + (2 * directionOffsets[1])]) {
           add_move(start, start + (2 * directionOffsets[1]));
         }
       }
@@ -142,14 +142,14 @@ void generate_pawn_moves(int start, char piece) {
 
     // Check frontleft & frontright.
     if (numSquaresToEdge[start][5] > 0) {
-      char frontleft = b->board[start + directionOffsets[5]];
+      char frontleft = b.board[start + directionOffsets[5]];
       if (frontleft && cur_color != get_color(frontleft)) {
         add_move(start, start + directionOffsets[5]);
       }
     }
 
     if (numSquaresToEdge[start][7] > 0) {
-      char frontright = b->board[start + directionOffsets[7]];
+      char frontright = b.board[start + directionOffsets[7]];
       if (frontright && cur_color != get_color(frontright)) {
         add_move(start, start + directionOffsets[7]);
       }
@@ -163,7 +163,7 @@ void generate_king_moves(int idx, char piece) {
   for (int i = 0; i < 8; i++) {
     if (numSquaresToEdge[idx][i] > 0) {
       int target = idx + directionOffsets[i];
-      int target_piece = b->board[target];
+      int target_piece = b.board[target];
 
       if(!is_color(target_piece, get_color(piece))) {
         add_move(idx, target);
@@ -211,7 +211,7 @@ void generate_knight_moves(int idx, char piece) {
 
   for (int i : l) {
     if (i >= 0 && i <= 64) {
-      if (!is_color(b->board[i], get_color(piece))) {
+      if (!is_color(b.board[i], get_color(piece))) {
         add_move(idx, i);
       }
     }
@@ -227,9 +227,9 @@ void generate_moves() {
 
   for (int idx = 0 ; idx < 64 ; idx++) {
 
-    char piece = b->board[idx];
+    char piece = b.board[idx];
 
-    if (is_color(piece, b->turn)) {
+    if (is_color(piece, b.turn)) {
       if (is_sliding_piece(piece)) {
         generate_sliding_moves(idx, piece);
       }
@@ -252,13 +252,13 @@ void generate_moves() {
 // Is my king in check?
 bool in_check() {
 
-  char cur_color = b->turn;
+  char cur_color = b.turn;
   
   // Find my king.
   int king_pos = 0;
   for (int i = 0 ; i < 64 ; i++) {
-    if ((cur_color == 'Z' && b->board[i] == 'K') || 
-        (cur_color == 'z' && b->board[i] == 'k')) {
+    if ((cur_color == 'Z' && b.board[i] == 'K') || 
+        (cur_color == 'z' && b.board[i] == 'k')) {
       king_pos = i;
       break;
     }
@@ -267,11 +267,11 @@ bool in_check() {
 
   // Check if my king is in check.
   std::vector<struct move> my_moves = moves;
-  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  b.turn = b.turn == 'z' ? 'Z' : 'z';
   generate_moves();
   std::vector<struct move> opp_moves = moves;
   moves = my_moves;
-  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  b.turn = b.turn == 'z' ? 'Z' : 'z';
   bool check = false;
 
   for (struct move m : opp_moves) {
@@ -288,13 +288,13 @@ bool in_check() {
 
 // Check if proposed move is legal
 bool validate(int start, int target) {
-  char piece = b->board[start];
-  char target_piece = b->board[target];
+  char piece = b.board[start];
+  char target_piece = b.board[target];
   char cur_color = get_color(piece);
   bool in_moves = false;
 
   // Check it is my piece.
-  if (cur_color != b->turn) {
+  if (cur_color != b.turn) {
     return false;
   }
 
@@ -313,8 +313,8 @@ bool validate(int start, int target) {
   
   int king_pos = 0;
   for (int i = 0 ; i < 64 ; i++) {
-    if ((cur_color == 'Z' && b->board[i] == 'K') || 
-        (cur_color == 'z' && b->board[i] == 'k')) {
+    if ((cur_color == 'Z' && b.board[i] == 'K') || 
+        (cur_color == 'z' && b.board[i] == 'k')) {
       king_pos = i;
       break;
     }
@@ -329,11 +329,11 @@ bool validate(int start, int target) {
 
     // Make opponent's moves after my move.
     std::vector<struct move> my_moves = moves;
-    b->turn = b->turn == 'z' ? 'Z' : 'z';
+    b.turn = b.turn == 'z' ? 'Z' : 'z';
     generate_moves();
     std::vector<struct move> opp_moves = moves;
     moves = my_moves;
-    b->turn = b->turn == 'z' ? 'Z' : 'z';
+    b.turn = b.turn == 'z' ? 'Z' : 'z';
     bool still_check = false;
 
     // Check if still in check.
@@ -364,11 +364,11 @@ bool validate(int start, int target) {
 
   // Make opponent's moves after my move.
   std::vector<struct move> my_moves = moves;
-  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  b.turn = b.turn == 'z' ? 'Z' : 'z';
   generate_moves();
   std::vector<struct move> opp_moves = moves;
   moves = my_moves;
-  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  b.turn = b.turn == 'z' ? 'Z' : 'z';
   bool still_check = false;
 
   // Check if in check.

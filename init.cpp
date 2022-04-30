@@ -42,19 +42,19 @@ bool check_if_end() {
 
   // Stalemate.
   std::vector<struct move> my_moves = moves;
-  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  b.turn = b.turn == 'z' ? 'Z' : 'z';
   generate_moves();
   std::vector<struct move> opp_moves = moves;
   moves = my_moves;
-  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  b.turn = b.turn == 'z' ? 'Z' : 'z';
 
   // Find my king and check.
   int king_pos = 0;
   bool check = false;
-  char cur_color = b->turn;
+  char cur_color = b.turn;
   for (int i = 0 ; i < 64 ; i++) {
-    if ((cur_color == 'Z' && b->board[i] == 'K') || 
-        (cur_color == 'z' && b->board[i] == 'k')) {
+    if ((cur_color == 'Z' && b.board[i] == 'K') || 
+        (cur_color == 'z' && b.board[i] == 'k')) {
       king_pos = i;
       break;
     }
@@ -75,7 +75,7 @@ bool check_if_end() {
   
   // Checkmate.
   if (moves.size() == 0) {
-    const char *c = b->turn == 'z' ? "White" : "Black";
+    const char *c = b.turn == 'z' ? "White" : "Black";
     printf("%s wins!\nEnd Board:\n", c);
     print_board();
     return true;
@@ -95,17 +95,13 @@ bool check_if_end() {
 // Initialize values.
 void init() {
   best_move.start = -1;
-	b->layout = (char*) malloc(sizeof(char) * 100);
-	strcpy(b->layout, board_start);
-	b->board = (int*) calloc(64, sizeof(int));
-	
-  struct board b;
   strcpy(b.layout, board_start);
   for (int i = 0 ; i < 64 ; i++ ) {
     b.board[i] = 0;
   }
 
   fen_to_board();
+  precomputeBoardOffsets();
 }
 
 
@@ -115,15 +111,14 @@ void play() {
   char inp[100];
   char str[8] = "autobot";
   init();
-  precomputeBoardOffsets();
 
   struct timeval start, end;
 
   FILE *file = fopen("minmax_stats.csv", "w+");
   fprintf(file, "moves, time, depth\n");
 	
+  print_board();
   while (exit_status < 1) {
-    gettimeofday(&start, NULL);
     generate_moves();
 
     // Output moves size to file.
@@ -134,21 +129,28 @@ void play() {
 
     if (check_if_end()) {
       printf("\nReseting Board.\n\n");
-      strcpy(b->layout, board_start);
+      strcpy(b.layout, board_start);
       fen_to_board();
+      generate_moves();
+      prune_moves();
       moves_ctr = 0;
       exit_status = 0;
     }
 
-		print_board();
+    if (strcmp(inp, "help") != 0 && (strcmp(inp, "bot") == 0 ||
+        strcmp(inp, "autobot") == 0 || (strlen(inp) == 4 && inp[1] != ' '))) {
+		  print_board();
+    }
 
     if (exit_status != -1) {
 		  printf("chess > ");
       fflush(stdout);
 		  fgets(inp, 100, stdin);
       inp[strlen(inp) - 1] = 0;
-		  exit_status = parse_inp(inp);
+      gettimeofday(&start, NULL);
+      exit_status = parse_inp(inp);
     } else {
+      gettimeofday(&start, NULL);
       exit_status = parse_inp(str);
     }
 
@@ -157,9 +159,10 @@ void play() {
     float dif_ms = ((end.tv_sec - start.tv_sec) * 1000000 
       + end.tv_usec - start.tv_usec) / 1000;
     
-    if (strcmp(inp, "bot") == 0 || strcmp(inp, "autobot") == 0) {
+    if (strcmp(inp, "bot") == 0 || strcmp(inp, "autobot") == 0 || strcmp(inp, "p") == 0) {
       fprintf(file, "%f, %d\n", dif_ms, global_depth);
       printf("Time to think = %f ms\n", dif_ms);
+      fflush(stdout);
     }
 	}
 

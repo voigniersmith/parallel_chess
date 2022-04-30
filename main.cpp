@@ -7,7 +7,7 @@
 #include "init.cpp"
 
 // Global Variables.
-struct board* b;
+struct board b;
 int directionOffsets[] = {-8, 8, -1, 1, -9, 9, -7, 7};
 int numSquaresToEdge[64][8];
 std::vector<struct move> moves;
@@ -16,6 +16,7 @@ int moves_ctr = 0;
 struct move best_move;
 int global_depth = 5;
 int myrank, npes;
+int parallel = 0;
 
 // Driver code.
 int main (int argc, char** argv) {
@@ -26,7 +27,10 @@ int main (int argc, char** argv) {
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
   if (myrank == 0) {
+    printf("Final Project for Parallel Computing.\n");
+    printf("Developed by Team AAA.\n\n");
 	  printf("Welcome to chess!\n");
+    printf("Type 'help' for a list of commands.\n");
 
     play();
 

@@ -12,7 +12,7 @@ int evaluate() {
   int black_total = 0;
 
   for (int i = 0 ; i < 64 ; i++) {
-    char piece = b->board[i];
+    char piece = b.board[i];
     if (piece != 0) {
       if (isupper(piece)) {
         switch(piece) {
@@ -58,23 +58,17 @@ int evaluate() {
   } // end for.
 
   int eval = white_total - black_total;
-  int p = b->turn == 'Z' ? 1 : -1;
+  int p = b.turn == 'Z' ? 1 : -1;
   return eval * p;
 }
 
 
 // Minimax search.
 int search(int depth, int start_depth) {
- 
-  printf("Rank = %d\n", myrank);
-  print_board();
-  fflush(stdout);
 
   if (depth == 0) {
     return evaluate();
   }
-
-  printf("1\n");
 
   generate_moves();
   prune_moves();
@@ -91,7 +85,7 @@ int search(int depth, int start_depth) {
   std::vector<struct move> cur_moves = moves;
   for (struct move m : cur_moves) {
     char p = make_move(m.start, m.target);
-    b->turn = b->turn == 'z' ? 'Z' : 'z';
+    b.turn = b.turn == 'z' ? 'Z' : 'z';
     int eval = -1 * search(depth - 1, start_depth);
     if (eval >= best_eval) {
       best_eval = eval;
@@ -101,7 +95,7 @@ int search(int depth, int start_depth) {
     }
 
     unmake_move(m.start, m.target, p);
-    b->turn = b->turn == 'z' ? 'Z' : 'z';
+    b.turn = b.turn == 'z' ? 'Z' : 'z';
   }
   return best_eval;
 }
@@ -128,8 +122,8 @@ void move_ordering() {
   
   for (struct move m : my_moves) {
     int move_score_guess = 0;
-    char piece = tolower(b->board[m.start]);
-    char target_piece = tolower(b->board[m.target]);
+    char piece = tolower(b.board[m.start]);
+    char target_piece = tolower(b.board[m.target]);
     int piece_val = 0;
     int target_val = 0;
 
@@ -177,13 +171,13 @@ void move_ordering() {
     // Penalize moving to square attacked my pawn.
 
     // Generate other guys pawn attack squares.
-    b->turn = b->turn == 'z' ? 'Z' : 'z';
+    b.turn = b.turn == 'z' ? 'Z' : 'z';
     moves.clear();
     for (int i = 0 ; i < 64 ; i++) {
-      generate_pawn_moves(i, b->board[i]);
+      generate_pawn_moves(i, b.board[i]);
     }
     std::vector<struct move> opp_pawn_moves = moves;
-    b->turn = b->turn == 'z' ? 'Z' : 'z';
+    b.turn = b.turn == 'z' ? 'Z' : 'z';
     moves = my_moves;
     
     // See if pawn can attack our move.
@@ -226,11 +220,11 @@ int ab_search(int depth, int start_depth, int alpha, int beta) {
   std::vector<struct move> cur_moves = moves;
   for (struct move m : cur_moves) {
     char p = make_move(m.start, m.target);
-    b->turn = b->turn == 'z' ? 'Z' : 'z';
+    b.turn = b.turn == 'z' ? 'Z' : 'z';
     int eval = -1 * ab_search(depth - 1, start_depth, -1 * beta, -1 *alpha);
 
     unmake_move(m.start, m.target, p);
-    b->turn = b->turn == 'z' ? 'Z' : 'z';
+    b.turn = b.turn == 'z' ? 'Z' : 'z';
     
     if (eval >= beta) {
       return beta;
@@ -262,7 +256,7 @@ int ab_cap_search(int depth, int start_depth, int alpha, int beta) {
   moves.clear();
   bool can_cap = false;
   for (struct move m : cur_moves) {
-    if (b->board[m.target] != 0) {
+    if (b.board[m.target] != 0) {
       can_cap = true;
       moves.push_back(m);
     }
@@ -282,11 +276,11 @@ int ab_cap_search(int depth, int start_depth, int alpha, int beta) {
   cur_moves = moves;
   for (struct move m : cur_moves) {
     char p = make_move(m.start, m.target);
-    b->turn = b->turn == 'z' ? 'Z' : 'z';
+    b.turn = b.turn == 'z' ? 'Z' : 'z';
     int eval = -1 * ab_search(depth - 1, start_depth, -1 * beta, -1 *alpha);
 
     unmake_move(m.start, m.target, p);
-    b->turn = b->turn == 'z' ? 'Z' : 'z';
+    b.turn = b.turn == 'z' ? 'Z' : 'z';
     
     if (eval >= beta) {
       return beta;

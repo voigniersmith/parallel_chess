@@ -16,25 +16,25 @@ void fen_to_board() {
 	int row = 0;
 	int col = 0;
 	int b_width = 8;
-	for (int i = 0; i < strlen(b->layout); i++) {
-    if (b->layout[i] == ' ') {
-      if (b->layout[i + 1] == 'w') {
-        b->turn = 'Z';
+	for (int i = 0; i < strlen(b.layout); i++) {
+    if (b.layout[i] == ' ') {
+      if (b.layout[i + 1] == 'w') {
+        b.turn = 'Z';
       } else {
-        b->turn = 'z';
+        b.turn = 'z';
       }
       break;
-		} else if (b->layout[i] == '/') {
+		} else if (b.layout[i] == '/') {
 			row++;
 			col = 0;
-		} else if (isdigit(b->layout[i])) {
-			int spaces = atoi(&b->layout[i]);
+		} else if (isdigit(b.layout[i])) {
+			int spaces = atoi(&b.layout[i]);
 			for (int j = 0; j < spaces; j++) {
-				b->board[row * b_width + col] = 0;
+				b.board[row * b_width + col] = 0;
 				col++;
 			}
 		} else {
-			b->board[row * b_width + col] = b->layout[i];
+			b.board[row * b_width + col] = b.layout[i];
 			col++;
 		}
 	}
@@ -49,14 +49,14 @@ void board_to_fen() {
 	int col = 0;
 	int pos = 0;
 	for (int spot = 0; spot < 64; spot++) {
-		if (b->board[spot] == 0) {
+		if (b.board[spot] == 0) {
 			spaces++;
 		} else {
 			if (spaces != 0) {
 				temp[pos++] = spaces + '0';
 				spaces = 0;
 			}
-			temp[pos++] = b->board[spot];
+			temp[pos++] = b.board[spot];
 		}
 
 		col++;
@@ -72,36 +72,36 @@ void board_to_fen() {
 		}
 	}
 
-  if (b->turn == 'Z') {
+  if (b.turn == 'Z') {
     temp[pos] = 'b';
-    b->turn = 'z';
+    b.turn = 'z';
   } else {
     temp[pos] = 'w';
-    b->turn = 'Z';
+    b.turn = 'Z';
   }
   temp[++pos] = 0;
+	
+  printf("%s\n", temp);
 
-	printf("%s\n", temp);
-
-	strcpy(b->layout, temp);
+	strcpy(b.layout, temp);
 }
 
 
 // Function to print the board based on the layout
 void print_board () {
 	int rows = 8, columns = 0, spaces = 0;
-	int size = strlen(b->layout) - 2;
+	int size = strlen(b.layout) - 2;
 
-  if (b->turn == 'z')
-	  printf("\t->+------------------------+\n");
+  if (b.turn == 'z')
+	  printf("\t>>+------------------------+\n");
   else
 	  printf("\t  +------------------------+\n");
 
 	for (int i = 0; i < size; i++) {
 		printf("\t%d |", rows--);
-		while(b->layout[i] != '/' && i != size) {
-			if (isdigit(b->layout[i])) {
-				spaces = atoi(&b->layout[i]);
+		while(b.layout[i] != '/' && i != size) {
+			if (isdigit(b.layout[i])) {
+				spaces = atoi(&b.layout[i]);
 				while (spaces > 0) {
 					if (columns % 2 == 0 && rows % 2 == 1) {
 						printf(":::");
@@ -115,7 +115,7 @@ void print_board () {
 				}
 				i++;
 			} else {
-				printf(" %c ", b->layout[i++]);
+				printf(" %c ", b.layout[i++]);
 				columns++;
 			}
 		}
@@ -123,8 +123,8 @@ void print_board () {
 		columns = 0;
 	}
 
-  if (b->turn == 'Z')
-	  printf("\t->+------------------------+\n");
+  if (b.turn == 'Z')
+	  printf("\t>>+------------------------+\n");
   else
 	  printf("\t  +------------------------+\n");
 	printf("\t    a  b  c  d  e  f  g  h  \n");

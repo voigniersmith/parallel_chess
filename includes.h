@@ -25,8 +25,8 @@
 
 // Struct Declarations.
 struct board {
-	int* board; // Actual board.
-	char* layout; // FEN representation.
+	int board[64]; // Actual board.
+	char layout[100]; // FEN representation.
   char turn;  // White is Z, Black is z.
 };
 
@@ -36,7 +36,7 @@ struct move {
 
 
 // Global variables.
-extern struct board* b; // My board.
+extern struct board b; // My board.
 extern int directionOffsets[];  // Numbers to add to move in dir.
 extern int numSquaresToEdge[64][8];  // Bounds of board from any piece.
 extern std::vector<struct move> moves;  // All possible moves.
@@ -46,6 +46,7 @@ extern struct move best_move;
 extern int global_depth;
 extern int myrank;
 extern int npes;
+extern int parallel;
 
 // Function declarations.
 void prune_moves();

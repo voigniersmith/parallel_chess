@@ -10,23 +10,28 @@ struct work_msg {
   int d;
   struct board b;
   struct move m;
+  int p;
 };
+
 
 struct res_msg {
   int e;
   struct move m;
 };
 
+
 // Producer ends consumers.
 void terminate() {
   MPI_Status status;
+  int b;
 
   // Send p - 1 terminate messages.
   for (int i = 1; i < npes; i++) {
-    MPI_Recv(NULL, 0, MPI_BYTE, i, 2, MPI_COMM_WORLD, &status);
-    MPI_Send(NULL, 0, MPI_BYTE, i, 3, MPI_COMM_WORLD);
+    MPI_Recv(&b, 0, MPI_BYTE, i, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+    MPI_Send(&b, 0, MPI_BYTE, i, 3, MPI_COMM_WORLD);
   }
 }
+
 
 // Producer execution.
 struct move producer() {
@@ -41,7 +46,7 @@ struct move producer() {
   // Create queue of results
   std::vector<std::pair<int, struct move> > results;
 
-  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  b.turn = b.turn == 'z' ? 'Z' : 'z';
   
   // While work in queue.
   while (results.size() != moves.size()) {
@@ -59,8 +64,9 @@ struct move producer() {
       // Make Message.
       char c = make_move(m.start, m.target);
       w.d = global_depth - 1;
-      w.b = *b;
+      w.b = b;
       w.m = m;
+      w.p = parallel;
       unmake_move(m.start, m.target, c);
 
       // Send work
@@ -72,7 +78,7 @@ struct move producer() {
     }
   }
   
-  b->turn = b->turn == 'z' ? 'Z' : 'z';
+  b.turn = b.turn == 'z' ? 'Z' : 'z';
 
   // Sort moves by eval.
   std::sort(results.begin(), results.end(), compare);
@@ -94,25 +100,22 @@ void consumer() {
     MPI_Send(&w, 0, MPI_BYTE, 0, 2, MPI_COMM_WORLD);
 
     // Wait for work
-    MPI_Recv(&w, sizeof(w), MPI_BYTE, 0, 0, MPI_COMM_WORLD, &status);
+    MPI_Recv(&w, sizeof(w), MPI_BYTE, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
     if (status.MPI_TAG == 3) {
       break;
     }
 
-    printf("Rank %d: %c turn, move %d->%d\n", myrank, w.b.turn, w.m.start, w.m.target);
-    fflush(stdout);
     // Do work
-    b->turn = w.b.turn;
-    b->board = w.b.board;
-    b->layout = w.b.layout;
-
-    print_board();
-    fflush(stdout);
-
-    r.e = search(w.d, w.d);
-    printf("After search %d\n", myrank);
-    fflush(stdout);
+    parallel = w.p;
+    b = w.b;
+    if (parallel == 3) {
+      r.e = search(w.d, w.d);
+    } else if (parallel == 4) {
+      r.e = ab_search(w.d, w.d, INT_MIN, INT_MAX);
+    } else {
+      r.e = ab_cap_search(w.d, w.d, INT_MIN, INT_MAX);
+    }
     r.m = w.m;
 
     // Send results
