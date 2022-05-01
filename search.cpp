@@ -277,7 +277,7 @@ int ab_cap_search(int depth, int start_depth, int alpha, int beta) {
   for (struct move m : cur_moves) {
     char p = make_move(m.start, m.target);
     b.turn = b.turn == 'z' ? 'Z' : 'z';
-    int eval = -1 * ab_search(depth - 1, start_depth, -1 * beta, -1 *alpha);
+    int eval = -1 * ab_cap_search(depth - 1, start_depth, -1 * beta, -1 *alpha);
 
     unmake_move(m.start, m.target, p);
     b.turn = b.turn == 'z' ? 'Z' : 'z';
