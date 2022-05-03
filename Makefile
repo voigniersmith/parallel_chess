@@ -13,8 +13,7 @@ clean:
 	rm chess; rm *.csv
 
 stats:
-	rm chess; rm *.csv
-	make
+	rm chess; rm *.csv; make
 	mpirun -q -np 3 chess t
 	mpirun -q -np 5 chess t
 	mpirun -q -np 9 chess t
