@@ -100,7 +100,8 @@ int parse_inp(char* s) {
         global_depth = d;
 
         // Set board to bench FEN.
-        strcpy(b.layout, board_start);
+        char c[] = "rnbqk1nr/pppp4/8/4P1N1/1b1P4/2P5/P3P1BP/RNBQK1R1 b";
+        strcpy(b.layout, c);
         fen_to_board();
 
         struct timeval t1, t2;

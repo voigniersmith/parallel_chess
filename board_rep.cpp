@@ -90,6 +90,8 @@ void print_board () {
 	int rows = 8, columns = 0, spaces = 0;
 	int size = strlen(b.layout) - 2;
 
+  printf("FEN: %s\n", b.layout);
+
   if (b.turn == 'z')
 	  printf("\t>>+------------------------+\n");
   else
