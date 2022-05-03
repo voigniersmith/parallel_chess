@@ -1,0 +1,56 @@
+Final Project for Parallel Computing.
+Developed by Team AAA.
+Akshay Pawar, Andrew Smith, Avarokin Saini.
+
+
+Welcome to chess!
+	  +------------------------+
+	8 | r  n  b  q  k  b  n  r |
+	7 | p  p  p  p  p  p  p  p |
+	6 |:::   :::   :::   :::   |
+	5 |   :::   :::   :::   :::|
+	4 |:::   :::   :::   :::   |
+	3 |   :::   :::   :::   :::|
+	2 | P  P  P  P  P  P  P  P |
+	1 | R  N  B  Q  K  B  N  R |
+	>>+------------------------+
+	    a  b  c  d  e  f  g  h  
+
+
+Description:
+	This is our basic implementation of chess. The goal of this project
+is to see the effects of a parallel implementation versus a serial
+implementation of the search function for chess. This code uses
+Open MPI which is a message passing interface for C. Hence this requires
+the mpi compiler and specifying the number of processors to use. Please
+see the Makefile Commands section for more information.
+
+
+Makefile Commands:
+	'make'			Compile the program into binary 'chess' executable.
+	'make run'		Compile and run the chess program with 4 processors.
+	'make clean'	Remove the chess program and any stats files.
+	'make stats'	Compile and run the chess program automatically
+						outputting stats to their respective stats_*.csv.
+
+
+Options:
+	'help'			Displays this screen.
+	'c' || 'clear'	Resets the board.
+	'q' || 'exit'	Cleanly exit the program.
+	'd %d'			Change bot search depth to integer.
+	't %d'			Change bot search type using integer.
+	'bot'			Let the computer make next move.
+	'autobot'		Let computer finish the game.
+	'%c%d%c%d'		From-To Coordinate notation.
+					Forsyth-Edwards notation is allowed.
+
+
+Type Usage for 't':
+	0: Serial MinMax Search.
+	1: Serial MinMax Search with Alpha-Beta Pruning.
+	2: Serial MinMax Search with Alpha-Beta Pruning and Move Ordering.
+	3: Parallel MinMax Search.
+	4: Parallel MinMax Search with Alpha-Beta Pruning.
+	5: Parallel MinMax Search with Alpha-Beta Pruning and Move Ordering.
+
