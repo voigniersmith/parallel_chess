@@ -87,7 +87,7 @@ int parse_inp(char* s) {
     char filename[100];
     sprintf(filename, "stats_%d.csv", npes);
     FILE *file = fopen(filename, "w+");
-    fprintf(file, "p, d, t, time\n");
+    fprintf(file, "p,d,t,time\n");
 	
     for (int d = 1 ; d < 7 ; d++) {
       for (int t = 0 ; t < 6 ; t++) {
@@ -109,8 +109,9 @@ int parse_inp(char* s) {
         bot_make_move();
         gettimeofday(&t2, NULL);
       
-        float dif_ms = (t2.tv_sec - t1.tv_sec) * 1000 + (t2.tv_usec - t1.tv_usec) / 1000;
-        fprintf(file, "%d, %d, %d, %f\n", npes - 1, d, t, dif_ms);
+        float dif_ms = (float) (t2.tv_sec - t1.tv_sec) * 1000 
+          + (float) (t2.tv_usec - t1.tv_usec) / (float) 1000;
+        fprintf(file, "%d,%d,%d,%.3f\n", npes - 1, d, t, dif_ms);
         fflush(file);
 
       }

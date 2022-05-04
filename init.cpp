@@ -158,8 +158,8 @@ void play() {
 
     gettimeofday(&end, NULL);
 
-    float dif_ms = ((end.tv_sec - start.tv_sec) * 1000000 
-      + end.tv_usec - start.tv_usec) / 1000;
+    float dif_ms = (float) ((float) (end.tv_sec - start.tv_sec) * 1000000 
+      + end.tv_usec - start.tv_usec) /(float) 1000;
     
     if (strcmp(inp, "bot") == 0 || strcmp(inp, "autobot") == 0 || strcmp(inp, "p") == 0) {
       printf("Time to think = %f ms\n", dif_ms);
